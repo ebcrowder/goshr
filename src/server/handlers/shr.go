@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ebcrowder/goshr/db"
+	"github.com/ebcrowder/goshr/service"
 )
 
 type shrHandlers struct {
@@ -24,7 +25,7 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
 	ctx := db.SetRepository(r.Context(), handlers.sqlite)
 
-	fileList, err := db.GetFiles(ctx)
+	fileList, err := service.GetFiles(ctx)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return

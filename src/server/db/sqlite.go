@@ -2,30 +2,23 @@ package db
 
 import (
 	"database/sql"
+	"log"
+	"os"
 
-	_ "github.com/lib/pq"
+	"github.com/ebcrowder/goshr/schema"
+	_ "github.com/mattn/go-sqlite3"
 )
-
-type File struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Key  string `json:"key"`
-}
 
 type Sqlite struct {
 	DB *sql.DB
 }
 
 func ConnectSqlite() (*Sqlite, error) {
-	var connStr = "~/sqlite-data/goshr.db"
-	db, err := sql.Open("sqlite3", connStr)
-	if err != nil {
-		return nil, err
-	}
+	os.Remove("~/sqlite-data/goshr.db")
 
-	err = db.Ping()
+	db, err := sql.Open("sqlite3", "~/sqlite-data/goshr.db")
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
 	return &Sqlite{db}, nil
@@ -35,7 +28,7 @@ func (p *Sqlite) Close() {
 	p.DB.Close()
 }
 
-func (p *Sqlite) Insert(file *File) (int, error) {
+func (p *Sqlite) Insert(file *schema.File) (int, error) {
 	query := `
 		INSERT INTO file (id, name, key)
 		VALUES (nextval('todo_id'), $1, $2)
@@ -70,7 +63,7 @@ func (p *Sqlite) Delete(id int) error {
 	return nil
 }
 
-func (p *Sqlite) GetFiles() ([]File, error) {
+func (p *Sqlite) GetFiles() ([]schema.File, error) {
 	query := `
 		SELECT *
 		FROM file 
@@ -82,9 +75,9 @@ func (p *Sqlite) GetFiles() ([]File, error) {
 		return nil, err
 	}
 
-	var fileList []File
+	var fileList []schema.File
 	for rows.Next() {
-		var t File
+		var t schema.File
 		if err := rows.Scan(&t.ID, &t.Name, &t.Key); err != nil {
 			return nil, err
 		}
