@@ -14,9 +14,9 @@ type Sqlite struct {
 }
 
 func ConnectSqlite() (*Sqlite, error) {
-	os.Remove("~/sqlite-data/goshr.db")
+	os.Remove("../../../../sqlite-data/goshr.db")
 
-	db, err := sql.Open("sqlite3", "~/sqlite-data/goshr.db")
+	db, err := sql.Open("sqlite3", "../../../../sqlite-data/goshr.db")
 	if err != nil {
 		log.Fatal(err)
 	}
