@@ -2,11 +2,15 @@ package handlers
 
 import (
 	"net/http"
+
+	"github.com/ebcrowder/goshr/db"
 )
 
 // SetUpRoutes sets up server routes
-func SetUpRoutes() *http.ServeMux {
-	shrHandlers := &shrHandlers{}
+func SetUpRoutes(sqlite *db.Sqlite) *http.ServeMux {
+	shrHandlers := &shrHandlers{
+		sqlite: sqlite,
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {

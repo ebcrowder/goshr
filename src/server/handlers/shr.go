@@ -3,9 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/ebcrowder/goshr/db"
 )
 
-type shrHandlers struct{}
+type shrHandlers struct {
+	sqlite *db.Sqlite
+}
 
 func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
 	responseOk(w, "hi")
@@ -18,7 +22,15 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 }
 
 func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
-	responseOk(w, "hi")
+	ctx := db.SetRepository(r.Context(), handlers.sqlite)
+
+	fileList, err := db.GetFiles(ctx)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responseOk(w, fileList)
 }
 
 func responseOk(w http.ResponseWriter, body interface{}) {
