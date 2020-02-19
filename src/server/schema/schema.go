@@ -1,7 +1,6 @@
 package schema
 
 type File struct {
-	ID   int    `json:"id"`
-	Name string `json:"title"`
-	Key  string `json:"note"`
+	Name string `json:"name"`
+	Key  string `json:"key"`
 }

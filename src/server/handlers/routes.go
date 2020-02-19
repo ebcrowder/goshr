@@ -7,9 +7,9 @@ import (
 )
 
 // SetUpRoutes sets up server routes
-func SetUpRoutes(sqlite *db.Sqlite) *http.ServeMux {
+func SetUpRoutes(redis *db.Redis) *http.ServeMux {
 	shrHandlers := &shrHandlers{
-		sqlite: sqlite,
+		redis: redis,
 	}
 
 	mux := http.NewServeMux()

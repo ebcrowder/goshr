@@ -2,18 +2,40 @@ package handlers
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/ebcrowder/goshr/db"
+	"github.com/ebcrowder/goshr/schema"
 	"github.com/ebcrowder/goshr/service"
 )
 
 type shrHandlers struct {
-	sqlite *db.Sqlite
+	redis *db.Redis
 }
 
 func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
-	responseOk(w, "hi")
+	ctx := db.SetRepository(r.Context(), handlers.redis)
+
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var file schema.File
+	if err := json.Unmarshal(b, &file); err != nil {
+		responseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := service.Insert(ctx, &file)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responseOk(w, id)
 }
 
 func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +45,7 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 }
 
 func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
-	ctx := db.SetRepository(r.Context(), handlers.sqlite)
+	ctx := db.SetRepository(r.Context(), handlers.redis)
 
 	fileList, err := service.GetFiles(ctx)
 	if err != nil {

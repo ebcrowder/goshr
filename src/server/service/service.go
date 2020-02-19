@@ -7,11 +7,7 @@ import (
 	"github.com/ebcrowder/goshr/schema"
 )
 
-func Close(ctx context.Context) {
-	db.Close(ctx)
-}
-
-func Insert(ctx context.Context, file *schema.File) (int, error) {
+func Insert(ctx context.Context, file *schema.File) (string, error) {
 	return db.Insert(ctx, file)
 }
 

@@ -16,18 +16,18 @@ func (apiHandler) ServeHTTP(http.ResponseWriter, *http.Request) {}
 func main() {
 	port := "8000"
 
-	var sqlite *db.Sqlite
+	var redis *db.Redis
 	var err error
 
-	sqlite, err = db.ConnectSqlite()
+	redis, err = db.ConnectRedis()
 
 	if err != nil {
 		panic(err)
-	} else if sqlite == nil {
-		panic("sqlite is nil")
+	} else if redis == nil {
+		panic("redis is nil")
 	}
 
-	mux := handlers.SetUpRoutes(sqlite)
+	mux := handlers.SetUpRoutes(redis)
 
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
