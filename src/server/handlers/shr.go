@@ -39,21 +39,57 @@ func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
+	ctx := db.SetRepository(r.Context(), handlers.redis)
 
-	responseOk(w, "hi")
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var req struct {
+		ID string `json:"id"`
+	}
+
+	if err := json.Unmarshal(b, &req); err != nil {
+		responseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := service.Delete(ctx, req.ID); err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 
 }
 
 func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
 	ctx := db.SetRepository(r.Context(), handlers.redis)
 
-	fileList, err := service.GetFiles(ctx)
+	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	responseOk(w, fileList)
+	var req struct {
+		ID string `json:"id"`
+	}
+
+	if err := json.Unmarshal(b, &req); err != nil {
+		responseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	val, err := service.GetFiles(ctx, req.ID)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responseOk(w, val)
 }
 
 func responseOk(w http.ResponseWriter, body interface{}) {

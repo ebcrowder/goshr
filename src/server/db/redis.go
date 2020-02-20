@@ -1,9 +1,6 @@
 package db
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/ebcrowder/goshr/schema"
 	"github.com/go-redis/redis/v7"
 )
@@ -19,40 +16,32 @@ func ConnectRedis() (*Redis, error) {
 		DB:       0,  // use default DB
 	})
 
-	pong, err := client.Ping().Result()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Print(pong)
-
 	return &Redis{client}, nil
 }
 
 func (r *Redis) Insert(file *schema.File) (string, error) {
-
-	err := r.DB.Set(file.Name, file.Key, 0).Err()
+	err := r.DB.HMSet(file.Id, []string{"name", file.Name, "key", file.Key}).Err()
 	if err != nil {
 		panic(err)
 	}
 
-	return "hi", nil
+	return file.Id, nil
 }
 
-func (r *Redis) Delete(id int) error {
+func (r *Redis) Delete(id string) error {
+	err := r.DB.Del(id).Err()
+	if err != nil {
+		panic(err)
+	}
+
 	return nil
 }
 
-func (r *Redis) GetFiles() ([]schema.File, error) {
-
-	var fileList []schema.File
-
-	val, err := r.DB.Get("test right here").Result()
+func (r *Redis) GetFiles(id string) ([]interface{}, error) {
+	val, err := r.DB.HMGet(id, "name", "key").Result()
 	if err != nil {
 		panic(err)
 	}
 
-	fileList[0] = [Name "test"]schema.File
-
-	return fileList, nil
+	return val, nil
 }

@@ -11,10 +11,10 @@ func Insert(ctx context.Context, file *schema.File) (string, error) {
 	return db.Insert(ctx, file)
 }
 
-func Delete(ctx context.Context, id int) error {
+func Delete(ctx context.Context, id string) error {
 	return db.Delete(ctx, id)
 }
 
-func GetFiles(ctx context.Context) ([]schema.File, error) {
-	return db.GetFiles(ctx)
+func GetFiles(ctx context.Context, id string) ([]interface{}, error) {
+	return db.GetFiles(ctx, id)
 }

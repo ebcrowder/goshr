@@ -10,8 +10,8 @@ const keyRepository = "Repository"
 
 type Repository interface {
 	Insert(file *schema.File) (string, error)
-	Delete(id int) error
-	GetFiles() ([]schema.File, error)
+	Delete(id string) error
+	GetFiles(id string) ([]interface{}, error)
 }
 
 func SetRepository(ctx context.Context, repository Repository) context.Context {
@@ -22,12 +22,12 @@ func Insert(ctx context.Context, file *schema.File) (string, error) {
 	return getRepository(ctx).Insert(file)
 }
 
-func Delete(ctx context.Context, id int) error {
+func Delete(ctx context.Context, id string) error {
 	return getRepository(ctx).Delete(id)
 }
 
-func GetFiles(ctx context.Context) ([]schema.File, error) {
-	return getRepository(ctx).GetFiles()
+func GetFiles(ctx context.Context, id string) ([]interface{}, error) {
+	return getRepository(ctx).GetFiles(id)
 }
 
 func getRepository(ctx context.Context) Repository {
