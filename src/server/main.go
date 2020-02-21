@@ -9,10 +9,6 @@ import (
 	"github.com/ebcrowder/goshr/handlers"
 )
 
-type apiHandler struct{}
-
-func (apiHandler) ServeHTTP(http.ResponseWriter, *http.Request) {}
-
 func main() {
 	port := "8000"
 
