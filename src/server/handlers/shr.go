@@ -9,11 +9,11 @@ import (
 	"github.com/ebcrowder/goshr/schema"
 )
 
-type shrHandlers struct {
+type Handlers struct {
 	redis *db.Redis
 }
 
-func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) postFiles(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
@@ -26,7 +26,7 @@ func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := handlers.redis.Insert(&file)
+	id, err := h.redis.Insert(&file)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -35,7 +35,7 @@ func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
 	responseOk(w, id)
 }
 
-func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
@@ -51,7 +51,7 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := handlers.redis.Delete(req.ID); err != nil {
+	if err := h.redis.Delete(req.ID); err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -60,7 +60,7 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) getFiles(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
@@ -76,7 +76,7 @@ func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	val, err := handlers.redis.GetFiles(req.ID)
+	val, err := h.redis.GetFiles(req.ID)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return

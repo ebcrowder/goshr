@@ -7,7 +7,7 @@ import (
 )
 
 func SetUpRoutes(redis *db.Redis) *http.ServeMux {
-	shrHandlers := &shrHandlers{
+	Handlers := &Handlers{
 		redis: redis,
 	}
 
@@ -15,11 +15,11 @@ func SetUpRoutes(redis *db.Redis) *http.ServeMux {
 	mux.HandleFunc("/api", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			shrHandlers.getFiles(w, r)
+			Handlers.getFiles(w, r)
 		case http.MethodPost:
-			shrHandlers.postFiles(w, r)
+			Handlers.postFiles(w, r)
 		case http.MethodDelete:
-			shrHandlers.deleteFiles(w, r)
+			Handlers.deleteFiles(w, r)
 		default:
 			responseError(w, http.StatusNotFound, "")
 		}
