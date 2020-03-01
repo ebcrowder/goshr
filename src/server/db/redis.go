@@ -20,12 +20,12 @@ func ConnectRedis() (*Redis, error) {
 }
 
 func (r *Redis) Insert(file *schema.File) (string, error) {
-	err := r.DB.HMSet(file.Id, []string{"name", file.Name, "key", file.Key}).Err()
+	err := r.DB.HMSet(file.ID, []string{"name", file.Name, "key", file.Key}).Err()
 	if err != nil {
 		panic(err)
 	}
 
-	return file.Id, nil
+	return file.ID, nil
 }
 
 func (r *Redis) Delete(id string) error {
