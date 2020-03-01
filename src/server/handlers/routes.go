@@ -6,7 +6,6 @@ import (
 	"github.com/ebcrowder/goshr/db"
 )
 
-// SetUpRoutes sets up server routes
 func SetUpRoutes(redis *db.Redis) *http.ServeMux {
 	shrHandlers := &shrHandlers{
 		redis: redis,

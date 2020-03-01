@@ -97,7 +97,6 @@ func main() {
 
 	<-done
 	logger.Println("Server stopped")
-
 }
 
 func logging(logger *log.Logger) func(http.Handler) http.Handler {

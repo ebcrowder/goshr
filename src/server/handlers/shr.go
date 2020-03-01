@@ -7,7 +7,6 @@ import (
 
 	"github.com/ebcrowder/goshr/db"
 	"github.com/ebcrowder/goshr/schema"
-	"github.com/ebcrowder/goshr/service"
 )
 
 type shrHandlers struct {
@@ -15,8 +14,6 @@ type shrHandlers struct {
 }
 
 func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
-	ctx := db.SetRepository(r.Context(), handlers.redis)
-
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
@@ -29,7 +26,7 @@ func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := service.Insert(ctx, &file)
+	id, err := handlers.redis.Insert(&file)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -39,8 +36,6 @@ func (handlers *shrHandlers) postFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
-	ctx := db.SetRepository(r.Context(), handlers.redis)
-
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
@@ -56,7 +51,7 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := service.Delete(ctx, req.ID); err != nil {
+	if err := handlers.redis.Delete(req.ID); err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -66,8 +61,6 @@ func (handlers *shrHandlers) deleteFiles(w http.ResponseWriter, r *http.Request)
 }
 
 func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
-	ctx := db.SetRepository(r.Context(), handlers.redis)
-
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
@@ -83,7 +76,7 @@ func (handlers *shrHandlers) getFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	val, err := service.GetFiles(ctx, req.ID)
+	val, err := handlers.redis.GetFiles(req.ID)
 	if err != nil {
 		responseError(w, http.StatusInternalServerError, err.Error())
 		return
