@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/ebcrowder/goshr/db"
+	"github.com/ebcrowder/goshr/schema"
 )
 
 type Handlers struct {
@@ -17,37 +17,28 @@ type Handlers struct {
 }
 
 func (h *Handlers) postFiles(w http.ResponseWriter, r *http.Request) {
-	// b, err := ioutil.ReadAll(r.Body)
-	// if err != nil {
-	// 	responseError(w, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	// handles file upload and related form-data related to file
 
-	// var file schema.File
-	// if err := json.Unmarshal(b, &file); err != nil {
-	// 	responseError(w, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-
-	// id, err := h.redis.Insert(&file)
-	// if err != nil {
-	// 	responseError(w, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-
-	// handle file
-	// r.ParseMultipartForm(32 << 20)
-
-	// fileBytes, handler, err := r.FormFile("myFile")
-	// if err != nil {
-	// 	responseError(w, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-
+	// parse form-data and save into redis
 	r.ParseMultipartForm(32 << 20)
 
-	log.Println(r.Form)
+	b := r.Form
+	var data schema.File
 
+	data = schema.File{
+		ID:   b["id"][0],
+		Name: b["name"][0],
+		Key:  b["key"][0],
+	}
+
+	id, err := h.redis.Insert(&data)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// handle file and save to server
+	// TODO - shepherd file to S3
 	fileBytes, handler, err := r.FormFile("myFile")
 
 	defer fileBytes.Close()
@@ -60,7 +51,7 @@ func (h *Handlers) postFiles(w http.ResponseWriter, r *http.Request) {
 
 	io.Copy(f, fileBytes)
 
-	responseOk(w, 1)
+	responseOk(w, id)
 }
 
 func (h *Handlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
