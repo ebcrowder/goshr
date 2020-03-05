@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/ebcrowder/goshr/db"
-	"github.com/ebcrowder/goshr/schema"
 )
 
 type Handlers struct {
@@ -14,25 +17,50 @@ type Handlers struct {
 }
 
 func (h *Handlers) postFiles(w http.ResponseWriter, r *http.Request) {
-	b, err := ioutil.ReadAll(r.Body)
+	// b, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	responseError(w, http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	// var file schema.File
+	// if err := json.Unmarshal(b, &file); err != nil {
+	// 	responseError(w, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+
+	// id, err := h.redis.Insert(&file)
+	// if err != nil {
+	// 	responseError(w, http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	// handle file
+	// r.ParseMultipartForm(32 << 20)
+
+	// fileBytes, handler, err := r.FormFile("myFile")
+	// if err != nil {
+	// 	responseError(w, http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	r.ParseMultipartForm(32 << 20)
+
+	log.Println(r.Form)
+
+	fileBytes, handler, err := r.FormFile("myFile")
+
+	defer fileBytes.Close()
+
+	f, err := os.OpenFile(handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+
 	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
-		return
+		fmt.Println(err)
 	}
 
-	var file schema.File
-	if err := json.Unmarshal(b, &file); err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
-		return
-	}
+	io.Copy(f, fileBytes)
 
-	id, err := h.redis.Insert(&file)
-	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	responseOk(w, id)
+	responseOk(w, 1)
 }
 
 func (h *Handlers) deleteFiles(w http.ResponseWriter, r *http.Request) {
