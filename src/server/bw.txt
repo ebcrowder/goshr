@@ -1,1 +1,0 @@
-sudo docker run -d --name bitwarden   -e ROCKET_TLS='{certs="/ssl/live/bitwardenrs.ebcrowder.com/fullchain.pem",key="/ssl/live/bitwardenrs.ebcrowder.com/privkey.pem"}'   -v /etc/letsencrypt/:/ssl/   -e SIGNUPS_ALLOWED=false   -e WEB_VAULT_ENABLED=false   -v /bw-data/:/data/   -p 443:80   bitwardenrs/server:latest
